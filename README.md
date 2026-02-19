@@ -1,6 +1,4 @@
-# Softaworks Agent Skills
-
-Opinionated skills shared by [@leonardocouy](https://github.com/leonardocouy) for improving daily work efficiency with Claude Code. Skills are packaged instructions and scripts that extend agent capabilities across development, documentation, planning, and professional workflows.
+# Agent Skills
 
 Skills follow the [Agent Skills](https://agentskills.io/) format.
 
@@ -17,7 +15,7 @@ Skills follow the [Agent Skills](https://agentskills.io/) format.
 ### Quick Install (Recommended)
 
 ```bash
-npx skills add softaworks/agent-toolkit
+npx skills add cachemoney/agent-toolkit
 ```
 
 This method works with multiple AI coding agents (Claude Code, Codex, Cursor, AdaL, etc.)
@@ -27,7 +25,7 @@ This method works with multiple AI coding agents (Claude Code, Codex, Cursor, Ad
 Run the following commands in Claude Code:
 
 ```bash
-/plugin marketplace add softaworks/agent-toolkit
+/plugin marketplace add cachemoney/agent-toolkit
 /plugin
 ```
 
@@ -58,7 +56,7 @@ Run the following commands in Claude Code:
 
 Simply tell Claude Code:
 
-> Please install Skills from github.com/softaworks/agent-toolkit
+> Please install Skills from github.com/cachemoney/agent-toolkit
 
 ### Available Plugins
 
@@ -148,7 +146,7 @@ Add skills to project knowledge or paste SKILL.md contents into the conversation
 >
 > For full access, add the marketplace and install plugins:
 > ```bash
-> /plugin marketplace add softaworks/agent-toolkit
+> /plugin marketplace add cachemoney/agent-toolkit
 > /plugin install codex@agent-toolkit
 > ```
 
@@ -212,4 +210,4 @@ MIT
 
 - [Agent Skills Format](https://agentskills.io/)
 - [Claude Code Documentation](https://docs.anthropic.com/claude/docs)
-- [GitHub Repository](https://github.com/softaworks/agent-toolkit)
+- [GitHub Repository](https://github.com/cachemoney/agent-toolkit)
