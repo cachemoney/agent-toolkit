@@ -1,6 +1,6 @@
 ---
 name: reducing-entropy
-description: Manual-only skill for minimizing total codebase size. Only activate when explicitly requested by user. Measures success by final code amount, not effort. Bias toward deletion.
+description: Use when evaluating designs, reviewing code, or refactoring - measures success by total code in the final codebase, not effort to get there. Bias toward deletion.
 ---
 
 # Reducing Entropy
