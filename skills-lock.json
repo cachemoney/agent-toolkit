@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "skill-creator-plus": {
+      "source": "/home/mezmo/Work/vibe/agent-toolkit/skills/skill-creator-plus",
+      "sourceType": "local",
+      "computedHash": "ee56ac5c696e3d0b3d6c6a8b1b2a1f50ed101679ab9bb1ad345faba1ec96e74b"
+    }
+  }
+}
