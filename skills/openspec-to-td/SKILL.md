@@ -1,175 +1,175 @@
 ---
-name: openspec-to-beads
-description: PROACTIVELY convert approved OpenSpec specs into Beads issues when user applies a change or explicitly approves implementation. Creates trackable work with dependencies, discovers gaps, and maintains audit trail between planning and execution.
+name: openspec-to-td
+description: Intelligently convert approved OpenSpec changes into td task issues when a user applies a change or approves implementation. Creates grouped work sessions, discovers gaps, and maintains continuity between planning and execution using the td CLI.
 ---
 
-# OpenSpec to Beads Bridge
+# OpenSpec to td Bridge
 
-You are a workflow orchestrator that transforms planning artifacts (OpenSpec) into executable work streams (Beads), maintaining traceability and discovering implementation gaps proactively.
+You are a workflow orchestrator that transforms planning artifacts (OpenSpec) into executable, traceable work in `td`, maintaining context continuity across AI sessions.
 
-## Core Philosophy
+## Philosophy: Bridging Intent and Execution
 
-OpenSpec defines WHAT to build (immutable contract).
-Beads tracks execution STATE (mutable reality).
+OpenSpec defines **WHAT** to build — an immutable contract agreed upon before coding starts.
+`td` tracks **HOW** execution is unfolding — a mutable, living record of state.
 
-Your job: Bridge the gap intelligently, not mechanically.
+**Your job:** Bridge the gap intelligently, not mechanically.
+
+Before converting, ask yourself:
+- What is the *true intent* behind this spec — not just what it lists?
+- What is missing from the tasks that a thoughtful engineer would catch?
+- How should I group these issues so an agent (or human) picking this up next has enough context?
+- What structured decisions or blockers should I log to make handoffs effective?
+
+**Core principles:**
+1. **Intelligence over automation**: Never blindly map spec tasks to `td` issues 1:1
+2. **Context is king**: Group related issues into work sessions so future agents can pick up mid-stream
+3. **Log your reasoning**: Use `td log --decision` and `td log --blocker` to leave a trail
+4. **Proactive gaps**: Detect and create issues for missing tests, rollbacks, monitoring
+
+---
 
 ## When This Skill Activates
 
 **Automatic triggers:**
 - User runs `openspec apply <change>`
-- User says "implement this spec", "start working on X"
-- User approves a proposal and mentions "ready" or "let's go"
+- User says "implement this spec", "start working on X", "let's go"
+- User approves a proposal and signals readiness
 
 **Manual triggers:**
-- User explicitly asks to "convert spec to beads"
-- User says "create issues for this change"
+- "Convert spec to td issues"
+- "Create issues for this change"
 
 **DO NOT activate for:**
-- Just viewing specs (`openspec show`)
-- Creating proposals (planning phase)
-- Reviewing/iterating on specs
+- `openspec show` (just viewing)
+- Creating or iterating on proposals/specs
+- Any interaction that doesn't involve translating approved specs into executable tasks
+
+---
 
 ## Intelligent Conversion Process
 
-### 1. Context Gathering (Silent Reconnaissance)
+### 1. Context Gathering
+
+Read and deeply UNDERSTAND (not just skim):
+- `openspec/changes/<change>/proposal.md` → **WHY** this exists
+- `openspec/changes/<change>/tasks.md` → **WHAT** must happen
+- `openspec/changes/<change>/specs/*/spec.md` → **ACCEPTANCE** criteria
+- `openspec/changes/<change>/design.md` (if present) → **HOW** it's architected
+
+### 2. Critical Analysis Before Converting
+
+Ask yourself — and flag for the user if needed:
+1. **Are tasks well-scoped?** Too broad = risky. Flag and suggest splitting.
+2. **Are dependencies obvious?** DB migrations before API endpoints, configs before implementations.
+3. **What's missing?** Tests? Rollback plans? Monitoring? Documentation?
+4. **What will balloon?** Flag tasks likely to reveal more work when started.
+
+**If you find significant problems → tell the user before converting.**
+
+### 3. Smart Conversion
+
+Create `td` issues with structured intelligence. See `references/issue-creation.md` for templates.
+
+Key behaviors:
+- Use priority rules to assign P0/P1/P2 meaningfully — see `references/priority-and-dependency-rules.md`
+- Create an **epic issue** as the container for all tasks
+- Create **discovery issues** for proactively detected gaps
+- Think about issue titles as search anchors: `[<change>] <Category>: <specific action>`
+
+### 4. Set Up a Work Session
+
+After creating issues, immediately group them into a `td` work session. This is **critical** for AI agent continuity:
 
 ```bash
-# Verify prerequisites
-openspec show <change-name> 2>&1
-bd list --json 2>&1
+td ws start "<change-name> implementation"
+td ws tag <epic-id> <task-id1> <task-id2> ...
 ```
 
-Read and UNDERSTAND:
-- `openspec/changes/<change>/proposal.md` → WHY we're doing this
-- `openspec/changes/<change>/tasks.md` → WHAT needs to happen
-- `openspec/changes/<change>/specs/*/spec.md` → ACCEPTANCE criteria
-- `openspec/changes/<change>/design.md` (if exists) → HOW it's architected
+### 5. Present an Actionable Report
 
-### 2. Critical Analysis (Think Before Converting)
+Don't just list issues — give the user a clear picture:
+- **Breakdown by priority** (P0 infrastructure first, P1 implementation, discoveries)
+- **Ready-to-start tasks** (zero blockers right now)
+- **Dependency chains** (what unlocks what)
+- **Discovered gaps** that were proactively created
+- **Next steps** including how to start (`td start <id>`) and track (`td list`)
 
-Ask yourself:
-1. **Are tasks well-scoped?** If too broad, flag it
-2. **Are dependencies obvious?** DB migrations before API endpoints
-3. **What's missing?** Testing? Documentation? Deployment?
-4. **What will go wrong?** Identify tasks that will discover more work
-
-**If you find problems, TELL THE USER BEFORE CONVERTING**
-
-See `examples/conversion-workflow.md` for analysis examples.
-
-### 3. Smart Conversion (Not 1:1 Mapping)
-
-Use templates in `templates/issue-creation.md` to create issues with intelligence.
-
-**Priority logic** (from `data/priority-rules.md`):
-- Infrastructure/setup tasks: **p0** (blocks everything)
-- Core business logic: **p1**
-- Tests and documentation: **p1** (quality is not optional)
-- UI polish: **p2**
-
-**Type detection** (from `data/priority-rules.md`):
-- "setup", "configure" → `task`
-- "implement", "add" → `feature`
-- "refactor", "improve" → `task`
-- "test", "document" → `chore`
-
-### 4. Dependency Chain Construction
-
-Use patterns from `data/dependency-patterns.md`:
-
-**Auto-detect dependencies:**
-- Sequential within category (Task 1.2 blocks on 1.1)
-- DB/migrations → block → API/business logic
-- Config/setup → block → implementation
-- Implementation → related → tests (NOT blocks - parallel work)
-
-### 5. Proactive Gap Detection
-
-Use common patterns from `data/dependency-patterns.md` to create discovery issues:
-
-**Auto-detect missing:**
-- Rollback plans for migrations
-- Rate limiting for API endpoints
-- Error handling for external services
-- Monitoring/metrics for features
-- Tests for implementations
-
-### 6. Create Tracking Infrastructure
-
-**Epic issue** for the entire spec that links all tasks as children.
-
-See `templates/issue-creation.md` for epic and dependency templates.
-
-### 7. Actionable Report (Not Just Summary)
-
-Present output using format from `examples/conversion-workflow.md`:
-- Issue breakdown by priority
-- Proactive discoveries created
-- Ready-to-start tasks
-- Dependency chains
-- Next steps for user
-
-## Advanced Features
-
-### Complexity Estimation
-Add labels based on task description (see `data/priority-rules.md`):
-- "setup", "simple": `complexity:low`
-- "implement", "integrate": `complexity:medium`
-- "refactor", "migrate": `complexity:high`
-
-### Risk Flagging
-Create separate issues for:
-- Data migrations
-- External dependencies (3rd party APIs)
-- Tasks with "TODO: figure out"
+---
 
 ## Error Handling
 
 **If OpenSpec change doesn't exist:**
 ```
-❌ Change 'xyz' not found in openspec/changes/
-Available changes: [list them]
+❌ Change '<name>' not found in openspec/changes/
 Run: openspec list
 ```
 
-**If Beads not initialized:**
+**If td not initialized:**
 ```
-❌ Beads not initialized in this project.
-Run: bd init --prefix <project-name>
-```
-
-**If tasks.md is malformed:**
-```
-⚠️  tasks.md parsing issues detected: [list issues]
-Fix these first or I can attempt best-effort conversion.
+❌ td not initialized in this project.
+Run: td init --prefix <project-name>
 ```
 
-## Anti-Patterns to AVOID
+**If tasks.md is malformed or too vague:**
+```
+⚠️  Found issues in tasks.md: [list issues]
+Options:
+  a) Convert as-is and create discovery issues for gaps
+  b) Wait while you refine tasks.md first
+```
 
-❌ **Don't blindly copy tasks 1:1** - Use intelligence
-❌ **Don't ignore missing test tasks** - Create them proactively
-❌ **Don't make everything high priority** - Use smart prioritization
-❌ **Don't create 50 issues for 5 tasks** - Group related micro-tasks
-❌ **Don't lose the "why"** - Reference proposal.md in epic description
+---
 
-## Integration with Agent Workflow
+## Anti-Patterns to Avoid
 
-When agent sees: `User: "Let's implement add-auth"`
+❌ **Rote 1:1 task mapping**
+Why bad: Every spec task becomes one issue — ignoring dependencies, missing gaps, losing the "why"
+Better: Analyze the task list, group logically, split broad tasks, detect what's missing
 
-You automatically:
-1. Check if `openspec/changes/add-auth` exists
-2. Analyze tasks for quality
-3. Warn about gaps
-4. Convert with intelligence
-5. Present actionable next steps
-6. Prime agent to run `bd ready` and start work
+❌ **Generic log entries** (e.g., `td log "worked on it"`)
+Why bad: Future agents (or you after a context reset) have zero actionable context
+Better: `td log --decision "Used soft-deletes for audit trail"` or `td log --blocker "Awaiting API spec"`
 
-The user should feel like magic happened - planning seamlessly became execution.
+❌ **Skipping the work session**
+Why bad: Individually tracked issues lose shared state across sessions; handoffs become fragmented
+Better: Always run `td ws start "<change>"` and tag all generated issues immediately
+
+❌ **Everything is P1**
+Why bad: No signal on what to do first; agents will make poor ordering decisions
+Better: P0 for infrastructure that blocks everything, P1 for core work, P2 for polish
+
+❌ **Ignoring missing test or rollback tasks**
+Why bad: Production incidents, debugging pain, audit failures
+Better: Proactively create discovery issues for tests, rollbacks, monitoring gaps
+
+---
+
+## Variation Guidance
+
+**IMPORTANT:** Outputs should vary based on the specific spec and project context.
+
+Vary based on context:
+- **Issue granularity**: A complex spec warrants fine-grained issues; a small bug fix might need only 2-3 issues
+- **Priority distribution**: A data migration spec is almost all P0; a UI feature is mostly P1/P2
+- **Group structure**: Let the spec's logical sections (DB, API, frontend, tests) drive the work session grouping
+- **Discovery issues**: Create only genuine gaps — don't pad with generic "add tests" if tests are already specified
+
+Avoid converging on:
+- The same rigid sequence of "Setup → Implementation → Tests" regardless of spec content
+- Generic titles that could apply to any issue (be specific to the feature)
+- The same number of issues regardless of spec complexity
+
+---
 
 ## Reference Files
 
-- **Examples**: See `examples/conversion-workflow.md` for full conversion scenarios
-- **Templates**: See `templates/issue-creation.md` for command templates
-- **Priority Rules**: See `data/priority-rules.md` for smart prioritization logic
-- **Dependencies**: See `data/dependency-patterns.md` for auto-detection patterns
+- **Templates**: See `references/issue-creation.md` for `td create` command templates
+- **Rules**: See `references/priority-and-dependency-rules.md` for P0/P1/P2 logic and gap detection
+
+---
+
+## Remember
+
+The user should feel like **magic happened** — a fully-formed, ready-to-execute work stream materializing from their spec, complete with session context that any future AI agent can pick up cleanly.
+
+That only happens when you bridge intent to execution with intelligence, not automation.
